@@ -1,0 +1,1835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Hub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+
+        .header {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 3em;
+            background: linear-gradient(135deg, #00ff88, #00d4ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+
+        .game-card {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 500px;
+            margin: 0 auto;
+            border: 3px solid rgba(0, 255, 136, 0.5);
+        }
+
+        .game-card h2 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            color: #00ff88;
+        }
+
+        .game-card p {
+            font-size: 1.2em;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .play-btn {
+            padding: 20px 50px;
+            font-size: 1.5em;
+            background: linear-gradient(135deg, #00ff88, #00d4ff);
+            border: none;
+            border-radius: 50px;
+            color: #000;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .play-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* Game Screen */
+        .game-screen {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #1a1a2e;
+            z-index: 1000;
+        }
+
+        .game-screen.active {
+            display: block;
+        }
+
+        .game-header {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #00ff88;
+        }
+
+        .back-btn {
+            padding: 10px 25px;
+            background: #ff0044;
+            border: none;
+            border-radius: 10px;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1em;
+        }
+
+        .game-area {
+            display: flex;
+            height: calc(100vh - 60px);
+            padding: 20px;
+            gap: 20px;
+        }
+
+        .main-game {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            padding: 40px;
+        }
+
+        .stats {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 40px;
+            min-width: 400px;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 20px;
+            margin: 10px 0;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            font-size: 1.3em;
+        }
+
+        .stat-label {
+            color: #00ff88;
+            font-weight: bold;
+        }
+
+        .stat-value {
+            color: white;
+            font-weight: bold;
+        }
+
+        .coin-btn {
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: gold;
+            border: 10px solid #ffaa00;
+            font-size: 8em;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 50px rgba(255, 215, 0, 0.8);
+        }
+
+        .coin-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .coin-btn:active {
+            transform: scale(0.95);
+        }
+
+        .upgrades-panel {
+            width: 400px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 20px;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .upgrades-panel h2 {
+            color: #00ff88;
+            font-size: 2em;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .upgrade {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .upgrade-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .upgrade-name {
+            font-size: 1.3em;
+            color: #00ff88;
+            font-weight: bold;
+        }
+
+        .upgrade-level {
+            background: rgba(0, 255, 136, 0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .upgrade-desc {
+            color: #aaa;
+            margin-bottom: 10px;
+        }
+
+        .upgrade-cost {
+            color: #ffd700;
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+
+        .upgrade-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #00ff88, #00d4ff);
+            border: none;
+            border-radius: 10px;
+            color: #000;
+            font-weight: bold;
+            font-size: 1.1em;
+            cursor: pointer;
+        }
+
+        .upgrade-btn:hover {
+            transform: scale(1.02);
+        }
+
+        .upgrade-btn:disabled {
+            background: #555;
+            color: #999;
+            cursor: not-allowed;
+        }
+
+        .prestige-box {
+            background: rgba(255, 0, 136, 0.2);
+            padding: 20px;
+            border-radius: 15px;
+            border: 2px solid #ff0088;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .prestige-box h3 {
+            color: #ff0088;
+            margin-bottom: 10px;
+        }
+
+        .prestige-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #ff0088, #ff00ff);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            font-size: 1.1em;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .prestige-btn:disabled {
+            background: #555;
+            cursor: not-allowed;
+        }
+
+        /* Game Over Modal */
+        .game-over-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .game-over-modal.active {
+            display: flex;
+        }
+
+        .game-over-content {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            padding: 50px;
+            border-radius: 20px;
+            border: 3px solid #ff0044;
+            text-align: center;
+            max-width: 500px;
+            animation: modalPop 0.3s ease-out;
+        }
+
+        @keyframes modalPop {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .game-over-content h2 {
+            color: #ff0044;
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+
+        .game-over-stats {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        .game-over-stat {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            margin: 5px 0;
+            font-size: 1.2em;
+        }
+
+        .game-over-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .modal-btn.primary {
+            background: linear-gradient(135deg, #00ff88, #00d4ff);
+            color: #000;
+        }
+
+        .modal-btn.secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .modal-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* Username Change Modal */
+        .username-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 15000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .username-modal.active {
+            display: flex;
+        }
+
+        .username-modal-content {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            padding: 40px;
+            border-radius: 20px;
+            border: 3px solid #00ff88;
+            text-align: center;
+            min-width: 400px;
+            animation: modalPop 0.3s ease-out;
+        }
+
+        .username-modal-content h2 {
+            color: #00ff88;
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+
+        .username-input {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.3em;
+            border: 2px solid #00ff88;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            text-align: center;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+
+        .username-input:focus {
+            outline: none;
+            border-color: #00d4ff;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+        }
+
+        .username-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        /* Controls Menu */
+        .controls-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: rgba(0, 255, 136, 0.2);
+            border: 2px solid #00ff88;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 9000;
+            transition: all 0.3s;
+            font-size: 1.1em;
+        }
+
+        .controls-btn:hover {
+            background: rgba(0, 255, 136, 0.4);
+            transform: scale(1.05);
+        }
+
+        .controls-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 20000;
+            justify-content: center;
+            align-items: center;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .controls-modal.active {
+            display: flex;
+        }
+
+        .controls-content {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            padding: 40px;
+            border-radius: 20px;
+            border: 3px solid #00ff88;
+            max-width: 800px;
+            width: 100%;
+            animation: modalPop 0.3s ease-out;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .controls-content h2 {
+            color: #00ff88;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .controls-section {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            border: 2px solid rgba(0, 255, 136, 0.3);
+        }
+
+        .controls-section h3 {
+            color: #00d4ff;
+            font-size: 1.5em;
+            margin-bottom: 15px;
+        }
+
+        .control-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            margin: 8px 0;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .control-item:hover {
+            background: rgba(0, 255, 136, 0.1);
+            transform: translateX(5px);
+        }
+
+        .control-key {
+            min-width: 80px;
+            padding: 8px 15px;
+            background: linear-gradient(135deg, #00ff88, #00d4ff);
+            color: #000;
+            border-radius: 8px;
+            font-weight: bold;
+            text-align: center;
+            margin-right: 20px;
+            font-size: 1em;
+        }
+
+        .control-desc {
+            flex: 1;
+            font-size: 1.1em;
+        }
+
+        .controls-close-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #00ff88, #00d4ff);
+            border: none;
+            border-radius: 10px;
+            color: #000;
+            font-weight: bold;
+            font-size: 1.2em;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+
+        .controls-close-btn:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <h1>🎮 GAME HUB</h1>
+    </div>
+
+    <!-- Main Menu -->
+    <div class="container" id="mainMenu">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 30px;">
+            <div class="game-card">
+                <h2>💰 Coin Clicker</h2>
+                <p>Click the coin to earn money! Buy upgrades and prestige for massive bonuses!</p>
+                <button class="play-btn" onclick="startGame('clicker')">PLAY NOW</button>
+            </div>
+
+            <div class="game-card">
+                <h2>🌊 Ocean Survival</h2>
+                <p>Explore the deep ocean! Gather resources, manage oxygen, avoid creatures, and survive!</p>
+                <button class="play-btn" onclick="startGame('ocean')">PLAY NOW</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Screen -->
+    <div class="game-screen" id="gameScreen">
+        <div class="game-header">
+            <h2 style="color: #00ff88;" id="gameTitle">💰 COIN CLICKER</h2>
+            <button class="back-btn" onclick="exitGame()">← BACK</button>
+        </div>
+        <div class="game-area" id="clickerGame">
+            <div class="main-game">
+                <div class="stats">
+                    <div class="stat-item">
+                        <span class="stat-label">💰 Coins</span>
+                        <span class="stat-value" id="coins">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">👆 Per Click</span>
+                        <span class="stat-value" id="perClick">1</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">⚡ Per Second</span>
+                        <span class="stat-value" id="perSecond">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">🌟 Prestige</span>
+                        <span class="stat-value" id="prestige">0</span>
+                    </div>
+                </div>
+
+                <button class="coin-btn" onclick="clickCoin()">💰</button>
+                
+                <p style="margin-top: 30px; font-size: 1.2em; opacity: 0.8;">Click the coin!</p>
+            </div>
+
+            <div class="upgrades-panel">
+                <h2>🛒 UPGRADES</h2>
+                <div id="upgradesList"></div>
+
+                <div class="prestige-box">
+                    <h3>🌟 PRESTIGE</h3>
+                    <p style="opacity: 0.9;">Reset for <span id="prestigeMult">2x</span> multiplier!</p>
+                    <button class="prestige-btn" id="prestigeBtn" onclick="doPrestige()">
+                        PRESTIGE (1000 coins)
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ocean Survival Game -->
+        <div class="game-area" id="oceanGame" style="display: none;">
+            <div style="flex: 1; position: relative;">
+                <canvas id="oceanCanvas" style="display: block; width: 100%; height: 100%; border-radius: 15px;"></canvas>
+                
+                <!-- HUD -->
+                <div style="position: absolute; top: 20px; left: 20px; right: 20px;">
+                    <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                        <div style="background: rgba(0, 0, 0, 0.8); padding: 15px 25px; border-radius: 10px; border: 2px solid #00d4ff;">
+                            <span style="color: #00d4ff; font-weight: bold;">🫁 OXYGEN</span><br>
+                            <div style="background: #333; height: 20px; width: 200px; border-radius: 10px; margin-top: 5px; overflow: hidden;">
+                                <div id="oxygenBar" style="background: linear-gradient(90deg, #00d4ff, #0088ff); height: 100%; width: 100%; transition: width 0.3s;"></div>
+                            </div>
+                        </div>
+                        <div style="background: rgba(0, 0, 0, 0.8); padding: 15px 25px; border-radius: 10px; border: 2px solid #ff9900;">
+                            <span style="color: #ff9900; font-weight: bold;">🍖 HUNGER</span><br>
+                            <div style="background: #333; height: 20px; width: 200px; border-radius: 10px; margin-top: 5px; overflow: hidden;">
+                                <div id="hungerBar" style="background: linear-gradient(90deg, #ff9900, #ff5500); height: 100%; width: 100%; transition: width 0.3s;"></div>
+                            </div>
+                        </div>
+                        <div style="background: rgba(0, 0, 0, 0.8); padding: 15px 25px; border-radius: 10px; border: 2px solid #00ff88;">
+                            <span style="color: #00ff88; font-weight: bold;">📦 RESOURCES</span><br>
+                            <span style="font-size: 1em;" id="resources">Metal: 0 | Crystal: 0 | Wood: 0</span>
+                        </div>
+                        <div style="background: rgba(0, 0, 0, 0.8); padding: 15px 25px; border-radius: 10px; border: 2px solid #ffd700;">
+                            <span style="color: #ffd700; font-weight: bold;">⭐ SCORE</span><br>
+                            <span style="font-size: 1.5em; font-weight: bold;" id="oceanScore">0</span>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 20px; margin-top: 15px; flex-wrap: wrap;">
+                        <div style="background: rgba(0, 0, 0, 0.8); padding: 15px 25px; border-radius: 10px; border: 2px solid #ff69b4;">
+                            <span style="color: #ff69b4; font-weight: bold;">🎣 BAIT</span><br>
+                            <span style="font-size: 1.3em; font-weight: bold;" id="baitCount">0 / 2</span>
+                        </div>
+                        <div style="background: rgba(0, 0, 0, 0.8); padding: 15px 25px; border-radius: 10px; border: 2px solid #4CAF50;">
+                            <span style="color: #4CAF50; font-weight: bold;">🐟 FISH</span><br>
+                            <span style="font-size: 1.3em; font-weight: bold;" id="fishCount">0 / 10</span>
+                        </div>
+                        <div id="spearIndicator" style="background: rgba(0, 0, 0, 0.8); padding: 15px 25px; border-radius: 10px; border: 2px solid #888; display: none;">
+                            <span style="color: #888; font-weight: bold;">🔱 NO SPEAR</span><br>
+                            <span style="font-size: 0.9em;">Craft in upgrades!</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Controls Info -->
+                <div style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(0, 0, 0, 0.8); padding: 15px 30px; border-radius: 10px; border: 2px solid #00ff88;">
+                    <span style="font-size: 1.1em;">Press 🎮 CONTROLS button for help!</span>
+                </div>
+            </div>
+
+            <div class="upgrades-panel">
+                <h2>🔧 UPGRADES</h2>
+                <div id="oceanUpgradesList"></div>
+
+                <div style="background: rgba(0, 212, 255, 0.2); padding: 20px; border-radius: 15px; border: 2px solid #00d4ff; margin-top: 20px;">
+                    <h3 style="color: #00d4ff; text-align: center; margin-bottom: 10px;">🏆 YOUR STATS</h3>
+                    <p style="text-align: center; font-size: 0.9em;" id="achievements">Depth Record: 0m</p>
+                    <p style="text-align: center; font-size: 0.9em; color: #00ff88; margin-top: 5px;">
+                        Player: <span id="currentUsername">Anonymous</span>
+                    </p>
+                    <button onclick="changeUsername()" style="width: 100%; padding: 8px; margin-top: 10px; background: rgba(0, 212, 255, 0.3); border: 1px solid #00d4ff; border-radius: 5px; color: white; cursor: pointer; font-size: 0.9em;">
+                        Change Username
+                    </button>
+                </div>
+
+                <div style="background: rgba(255, 215, 0, 0.1); padding: 15px; border-radius: 15px; border: 2px solid #ffd700; margin-top: 20px; max-height: 400px; overflow-y: auto;">
+                    <h3 style="color: #ffd700; text-align: center; margin-bottom: 15px;">🌍 GLOBAL LEADERBOARD</h3>
+                    <div id="leaderboardList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Controls Button (visible in Ocean game) -->
+    <button class="controls-btn" id="controlsBtn" style="display: none;" onclick="openControlsMenu()">
+        🎮 CONTROLS
+    </button>
+
+    <!-- Controls Modal -->
+    <div class="controls-modal" id="controlsModal">
+        <div class="controls-content">
+            <h2>🎮 GAME CONTROLS</h2>
+
+            <div class="controls-section">
+                <h3>⚡ MOVEMENT</h3>
+                <div class="control-item">
+                    <div class="control-key">W</div>
+                    <div class="control-desc">Swim Up</div>
+                </div>
+                <div class="control-item">
+                    <div class="control-key">S</div>
+                    <div class="control-desc">Swim Down</div>
+                </div>
+                <div class="control-item">
+                    <div class="control-key">A</div>
+                    <div class="control-desc">Swim Left</div>
+                </div>
+                <div class="control-item">
+                    <div class="control-key">D</div>
+                    <div class="control-desc">Swim Right</div>
+                </div>
+                <div class="control-item">
+                    <div class="control-key">SPACE</div>
+                    <div class="control-desc">Ascend Quickly</div>
+                </div>
+                <div class="control-item">
+                    <div class="control-key">SHIFT</div>
+                    <div class="control-desc">Descend Quickly</div>
+                </div>
+            </div>
+
+            <div class="controls-section">
+                <h3>🔱 COMBAT & SURVIVAL</h3>
+                <div class="control-item">
+                    <div class="control-key">E</div>
+                    <div class="control-desc">Hunt Fish (requires spear, adds to inventory)</div>
+                </div>
+                <div class="control-item">
+                    <div class="control-key">Q</div>
+                    <div class="control-desc">Eat Fish (from inventory, restores hunger)</div>
+                </div>
+            </div>
+
+            <div class="controls-section">
+                <h3>📦 RESOURCES & ITEMS</h3>
+                <div class="control-item">
+                    <div class="control-key">TOUCH</div>
+                    <div class="control-desc">Collect resources (metal ⚙️, crystal 💎, wood 🪵)</div>
+                </div>
+                <div class="control-item">
+                    <div class="control-key">-</div>
+                    <div class="control-desc">Max 1000 resources total, 10 fish max</div>
+                </div>
+            </div>
+
+            <div class="controls-section">
+                <h3>🎣 BAIT SYSTEM</h3>
+                <div class="control-item">
+                    <div class="control-key">BUY</div>
+                    <div class="control-desc">Craft bait with 2 crystals (max 2 bait)</div>
+                </div>
+                <div class="control-item">
+                    <div class="control-key">-</div>
+                    <div class="control-desc">Bait attracts fish to you! Loses 1 per catch</div>
+                </div>
+            </div>
+
+            <div class="controls-section">
+                <h3>🎯 OBJECTIVE</h3>
+                <div class="control-item">
+                    <div class="control-key">GOAL</div>
+                    <div class="control-desc">Dive as deep as possible while managing oxygen & hunger</div>
+                </div>
+                <div class="control-item">
+                    <div class="control-key">SURFACE</div>
+                    <div class="control-desc">Return to surface (above water) to refill oxygen</div>
+                </div>
+                <div class="control-item">
+                    <div class="control-key">SURVIVE</div>
+                    <div class="control-desc">Hunt fish, avoid sharks 🦈, manage resources</div>
+                </div>
+            </div>
+
+            <div class="controls-section">
+                <h3>⚠️ DANGERS</h3>
+                <div class="control-item">
+                    <div class="control-key">🦈</div>
+                    <div class="control-desc">Red sharks chase and damage you (-20 oxygen)</div>
+                </div>
+                <div class="control-item">
+                    <div class="control-key">🫁</div>
+                    <div class="control-desc">Die if oxygen reaches 0 underwater</div>
+                </div>
+                <div class="control-item">
+                    <div class="control-key">🍖</div>
+                    <div class="control-desc">Die if hunger reaches 0</div>
+                </div>
+            </div>
+
+            <button class="controls-close-btn" onclick="closeControlsMenu()">✅ GOT IT!</button>
+        </div>
+    </div>
+
+    <!-- Username Change Modal -->
+    <div class="username-modal" id="usernameModal">
+        <div class="username-modal-content">
+            <h2>✏️ CHANGE USERNAME</h2>
+            <p style="color: #aaa; margin-bottom: 15px;">Enter your new username below:</p>
+            <input type="text" class="username-input" id="usernameInput" placeholder="Put username here" maxlength="20">
+            <div class="username-buttons">
+                <button class="modal-btn primary" onclick="confirmUsernameChange()">✅ SAVE</button>
+                <button class="modal-btn secondary" onclick="closeUsernameModal()">❌ CANCEL</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Over Modal -->
+    <div class="game-over-modal" id="gameOverModal">
+        <div class="game-over-content">
+            <h2 id="gameOverTitle">GAME OVER!</h2>
+            <p id="gameOverReason" style="font-size: 1.3em; color: #ff9900; margin-bottom: 20px;"></p>
+            
+            <div class="game-over-stats">
+                <div class="game-over-stat">
+                    <span style="color: #00d4ff;">👤 Player:</span>
+                    <span style="color: #00ff88; font-weight: bold;" id="gameOverUsername"></span>
+                </div>
+                <div class="game-over-stat">
+                    <span style="color: #ff9900;">🌊 Max Depth:</span>
+                    <span style="color: #fff; font-weight: bold;" id="gameOverDepth"></span>
+                </div>
+                <div class="game-over-stat">
+                    <span style="color: #ffd700;">⭐ Score:</span>
+                    <span style="color: #fff; font-weight: bold;" id="gameOverScore"></span>
+                </div>
+                <div class="game-over-stat">
+                    <span style="color: #00ff88;">🏆 Rank:</span>
+                    <span style="color: #fff; font-weight: bold;" id="gameOverRank"></span>
+                </div>
+            </div>
+
+            <p style="color: #00ff88; font-size: 1.1em;">Check the leaderboard! ➡️</p>
+
+            <div class="game-over-buttons">
+                <button class="modal-btn primary" onclick="restartOceanGame()">🔄 TRY AGAIN</button>
+                <button class="modal-btn secondary" onclick="closeGameOverModal()">← BACK TO HUB</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let game = {
+            coins: 0,
+            clickPower: 1,
+            prestigeLevel: 0,
+            prestigeMult: 1,
+            upgrades: {
+                click1: { level: 0, cost: 10, mult: 1.5, power: 1 },
+                click2: { level: 0, cost: 100, mult: 2, power: 10 },
+                auto1: { level: 0, cost: 50, mult: 1.8, cps: 1 },
+                auto2: { level: 0, cost: 500, mult: 2, cps: 10 }
+            }
+        };
+
+        const upgradeDefs = {
+            click1: { name: 'Better Click', desc: '+1 per click', icon: '👆' },
+            click2: { name: 'Mega Click', desc: '+10 per click', icon: '💥' },
+            auto1: { name: 'Auto Clicker', desc: '1 coin/sec', icon: '🤖' },
+            auto2: { name: 'Coin Factory', desc: '10 coins/sec', icon: '🏭' }
+        };
+
+        let currentGame = null;
+
+        function startGame(gameType) {
+            currentGame = gameType;
+            document.getElementById('mainMenu').style.display = 'none';
+            document.getElementById('gameScreen').classList.add('active');
+            
+            if (gameType === 'clicker') {
+                document.getElementById('gameTitle').textContent = '💰 COIN CLICKER';
+                document.getElementById('clickerGame').style.display = 'flex';
+                document.getElementById('oceanGame').style.display = 'none';
+                loadGame();
+                updateDisplay();
+                renderUpgrades();
+            } else if (gameType === 'ocean') {
+                document.getElementById('gameTitle').textContent = '🌊 OCEAN SURVIVAL';
+                document.getElementById('clickerGame').style.display = 'none';
+                document.getElementById('oceanGame').style.display = 'flex';
+                startOceanGame();
+            }
+        }
+
+        function exitGame() {
+            if (currentGame === 'clicker') {
+                saveGame();
+            } else if (currentGame === 'ocean') {
+                stopOceanGame();
+            }
+            document.getElementById('gameScreen').classList.remove('active');
+            document.getElementById('mainMenu').style.display = 'block';
+        }
+
+        function clickCoin() {
+            let power = game.clickPower;
+            power += game.upgrades.click1.level * 1;
+            power += game.upgrades.click2.level * 10;
+            power *= game.prestigeMult;
+            
+            game.coins += Math.floor(power);
+            updateDisplay();
+            saveGame();
+        }
+
+        function updateDisplay() {
+            document.getElementById('coins').textContent = Math.floor(game.coins).toLocaleString();
+            
+            let clickPower = game.clickPower;
+            clickPower += game.upgrades.click1.level * 1;
+            clickPower += game.upgrades.click2.level * 10;
+            clickPower *= game.prestigeMult;
+            document.getElementById('perClick').textContent = Math.floor(clickPower).toLocaleString();
+
+            let cps = 0;
+            cps += game.upgrades.auto1.level * 1;
+            cps += game.upgrades.auto2.level * 10;
+            cps *= game.prestigeMult;
+            document.getElementById('perSecond').textContent = Math.floor(cps).toLocaleString();
+
+            document.getElementById('prestige').textContent = game.prestigeLevel;
+            document.getElementById('prestigeMult').textContent = (game.prestigeLevel + 2) + 'x';
+            document.getElementById('prestigeBtn').disabled = game.coins < 1000;
+
+            // Update upgrades display in real-time
+            renderUpgrades();
+        }
+
+        function renderUpgrades() {
+            const list = document.getElementById('upgradesList');
+            list.innerHTML = '';
+
+            Object.keys(upgradeDefs).forEach(key => {
+                const def = upgradeDefs[key];
+                const upg = game.upgrades[key];
+                const cost = Math.floor(upg.cost * Math.pow(upg.mult, upg.level));
+                const canBuy = game.coins >= cost;
+
+                const div = document.createElement('div');
+                div.className = 'upgrade';
+                div.innerHTML = `
+                    <div class="upgrade-header">
+                        <span class="upgrade-name">${def.icon} ${def.name}</span>
+                        <span class="upgrade-level">Lv ${upg.level}</span>
+                    </div>
+                    <div class="upgrade-desc">${def.desc}</div>
+                    <div class="upgrade-cost">💰 ${cost.toLocaleString()}</div>
+                    <button class="upgrade-btn" onclick="buyUpgrade('${key}')" ${!canBuy ? 'disabled' : ''}>
+                        ${canBuy ? 'BUY' : 'NOT ENOUGH'}
+                    </button>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function buyUpgrade(key) {
+            const upg = game.upgrades[key];
+            const cost = Math.floor(upg.cost * Math.pow(upg.mult, upg.level));
+
+            if (game.coins >= cost) {
+                game.coins -= cost;
+                upg.level++;
+                updateDisplay();
+                renderUpgrades();
+                saveGame();
+            }
+        }
+
+        function doPrestige() {
+            if (game.coins >= 1000) {
+                if (confirm('Reset all progress for a permanent multiplier?')) {
+                    game.prestigeLevel++;
+                    game.prestigeMult = game.prestigeLevel + 1;
+                    game.coins = 0;
+                    Object.keys(game.upgrades).forEach(k => game.upgrades[k].level = 0);
+                    updateDisplay();
+                    renderUpgrades();
+                    saveGame();
+                    alert(`Prestige ${game.prestigeLevel}! ${game.prestigeMult}x multiplier!`);
+                }
+            }
+        }
+
+        // Auto earn
+        setInterval(() => {
+            let cps = 0;
+            cps += game.upgrades.auto1.level * 1;
+            cps += game.upgrades.auto2.level * 10;
+            cps *= game.prestigeMult;
+            
+            if (cps > 0) {
+                game.coins += cps / 10;
+                updateDisplay();
+            }
+        }, 100);
+
+        // Save/Load
+        function saveGame() {
+            localStorage.setItem('coinClickerGame', JSON.stringify(game));
+        }
+
+        function loadGame() {
+            const saved = localStorage.getItem('coinClickerGame');
+            if (saved) {
+                game = JSON.parse(saved);
+            }
+        }
+
+        setInterval(saveGame, 5000);
+
+        // ==================== OCEAN SURVIVAL GAME ====================
+        let oceanGameData = {
+            player: { x: 400, y: 100, size: 20, speed: 3, oxygen: 100, maxOxygen: 100, hunger: 100, maxHunger: 100 },
+            resources: { metal: 0, crystal: 0, wood: 0 },
+            inventory: { fish: 0 },
+            maxInventory: { fish: 10, resources: 1000 },
+            bait: 0,
+            maxBait: 2,
+            score: 0,
+            depth: 0,
+            maxDepth: 0,
+            cameraY: 0,
+            items: [],
+            creatures: [],
+            keys: {},
+            running: false,
+            canvas: null,
+            ctx: null,
+            animationId: null,
+            hasSpear: false,
+            spearCooldown: 0,
+            username: '',
+            upgrades: {
+                spear: { level: 0, cost: { wood: 5, metal: 2 } },
+                bait: { level: 0, cost: { crystal: 2 } },
+                oxygenTank: { level: 0, cost: { metal: 10, crystal: 5 } },
+                swimSpeed: { level: 0, cost: { metal: 15, crystal: 10 } },
+                scanner: { level: 0, cost: { metal: 20, crystal: 15 } }
+            }
+        };
+
+        // Global leaderboard stored in localStorage
+        function getLeaderboard() {
+            const saved = localStorage.getItem('oceanSurvivalLeaderboard');
+            return saved ? JSON.parse(saved) : [];
+        }
+
+        function saveToLeaderboard(username, depth, score) {
+            let leaderboard = getLeaderboard();
+            
+            // Find if player already exists
+            const existingIndex = leaderboard.findIndex(entry => 
+                entry.username.toLowerCase() === username.toLowerCase()
+            );
+
+            if (existingIndex !== -1) {
+                // Player exists - only update if this is better
+                if (depth > leaderboard[existingIndex].depth) {
+                    leaderboard[existingIndex] = {
+                        username: username,
+                        depth: Math.floor(depth),
+                        score: score,
+                        date: new Date().toISOString()
+                    };
+                }
+            } else {
+                // New player - add entry
+                leaderboard.push({
+                    username: username,
+                    depth: Math.floor(depth),
+                    score: score,
+                    date: new Date().toISOString()
+                });
+            }
+
+            // Sort by depth (highest first)
+            leaderboard.sort((a, b) => b.depth - a.depth);
+
+            // Keep top 100
+            leaderboard = leaderboard.slice(0, 100);
+
+            localStorage.setItem('oceanSurvivalLeaderboard', JSON.stringify(leaderboard));
+        }
+
+        function displayLeaderboard() {
+            const leaderboard = getLeaderboard();
+            const container = document.getElementById('leaderboardList');
+            
+            if (leaderboard.length === 0) {
+                container.innerHTML = '<p style="text-align: center; opacity: 0.7;">No entries yet! Be the first!</p>';
+                return;
+            }
+
+            container.innerHTML = '';
+            leaderboard.slice(0, 20).forEach((entry, index) => {
+                const div = document.createElement('div');
+                div.style.cssText = `
+                    background: rgba(255, 255, 255, 0.05);
+                    padding: 12px 15px;
+                    margin: 8px 0;
+                    border-radius: 8px;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    border-left: 4px solid ${index === 0 ? '#ffd700' : index === 1 ? '#c0c0c0' : index === 2 ? '#cd7f32' : '#00ff88'};
+                `;
+
+                const rank = index + 1;
+                const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`;
+
+                div.innerHTML = `
+                    <span style="font-weight: bold; min-width: 50px;">${medal}</span>
+                    <span style="flex: 1; color: #00d4ff;">${entry.username}</span>
+                    <span style="color: #ff9900; font-weight: bold;">${entry.depth}m</span>
+                    <span style="color: #888; margin-left: 15px;">${entry.score} pts</span>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        const oceanUpgradeDefs = {
+            spear: { name: 'Craft Spear', desc: 'Hunt green fish for food!', icon: '🔱' },
+            bait: { name: 'Buy Bait (2)', desc: 'Attracts fish to you', icon: '🎣' },
+            oxygenTank: { name: 'Oxygen Tank', desc: '+50 max oxygen', icon: '🫁' },
+            swimSpeed: { name: 'Swim Fins', desc: '+1 swim speed', icon: '🏊' },
+            scanner: { name: 'Resource Scanner', desc: 'See resources further', icon: '📡' }
+        };
+
+        function startOceanGame() {
+            // Ask for username
+            let username = localStorage.getItem('oceanSurvivalUsername');
+            if (!username) {
+                username = prompt('Enter your username for the leaderboard:');
+                if (!username || username.trim() === '') {
+                    username = 'Anonymous';
+                }
+                username = username.trim().substring(0, 20); // Max 20 chars
+                localStorage.setItem('oceanSurvivalUsername', username);
+            }
+            oceanGameData.username = username;
+
+            // Show controls button
+            document.getElementById('controlsBtn').style.display = 'block';
+
+            const canvas = document.getElementById('oceanCanvas');
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            
+            oceanGameData.canvas = canvas;
+            oceanGameData.ctx = canvas.getContext('2d');
+            oceanGameData.running = true;
+            oceanGameData.player.y = 100;
+            oceanGameData.depth = 0;
+            oceanGameData.maxDepth = 0;
+            oceanGameData.score = 0;
+            oceanGameData.player.oxygen = oceanGameData.player.maxOxygen;
+            oceanGameData.player.hunger = oceanGameData.player.maxHunger;
+
+            // Spawn initial items
+            for (let i = 0; i < 20; i++) {
+                spawnResource();
+            }
+            for (let i = 0; i < 5; i++) {
+                spawnCreature();
+            }
+
+            // Controls
+            window.addEventListener('keydown', oceanKeyDown);
+            window.addEventListener('keyup', oceanKeyUp);
+
+            renderOceanUpgrades();
+            displayLeaderboard();
+            oceanGameLoop();
+        }
+
+        function stopOceanGame() {
+            oceanGameData.running = false;
+            if (oceanGameData.animationId) {
+                cancelAnimationFrame(oceanGameData.animationId);
+            }
+            window.removeEventListener('keydown', oceanKeyDown);
+            window.removeEventListener('keyup', oceanKeyUp);
+            
+            // Hide controls button
+            document.getElementById('controlsBtn').style.display = 'none';
+        }
+
+        function oceanKeyDown(e) {
+            oceanGameData.keys[e.key.toLowerCase()] = true;
+        }
+
+        function oceanKeyUp(e) {
+            oceanGameData.keys[e.key.toLowerCase()] = false;
+        }
+
+        function spawnResource() {
+            const types = ['metal', 'crystal', 'wood'];
+            const type = types[Math.floor(Math.random() * types.length)];
+            const depth = Math.random() * 2000; // Spawn resources up to 2000 depth
+            
+            let color;
+            if (type === 'metal') color = '#888888';
+            else if (type === 'crystal') color = '#00ffff';
+            else color = '#8B4513'; // Brown for wood
+            
+            oceanGameData.items.push({
+                type: type,
+                x: Math.random() * oceanGameData.canvas.width,
+                y: 200 + depth,
+                size: 15,
+                color: color
+            });
+        }
+
+        function spawnCreature() {
+            const depth = Math.random() * 1500;
+            const dangerous = Math.random() > 0.6;
+            oceanGameData.creatures.push({
+                x: Math.random() * oceanGameData.canvas.width,
+                y: 200 + depth,
+                size: dangerous ? 35 : 25,
+                speedX: (Math.random() - 0.5) * 3,
+                speedY: (Math.random() - 0.5) * 1.5,
+                dangerous: dangerous,
+                fleeTimer: 0,
+                fleeing: false
+            });
+        }
+
+        function collectResource(e) {
+            const rect = oceanGameData.canvas.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const clickY = e.clientY - rect.top;
+
+            oceanGameData.items.forEach((item, index) => {
+                const dx = clickX - item.x;
+                const dy = clickY - item.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (dist < item.size + 20) {
+                    oceanGameData.resources[item.type]++;
+                    oceanGameData.score += 10;
+                    oceanGameData.items.splice(index, 1);
+                    spawnResource();
+                    updateOceanDisplay();
+                    renderOceanUpgrades();
+                }
+            });
+        }
+
+        function updateOceanDisplay() {
+            document.getElementById('resources').textContent = 
+                `Metal: ${oceanGameData.resources.metal} | Crystal: ${oceanGameData.resources.crystal} | Wood: ${oceanGameData.resources.wood}`;
+            document.getElementById('oceanScore').textContent = oceanGameData.score;
+            document.getElementById('oxygenBar').style.width = 
+                (oceanGameData.player.oxygen / oceanGameData.player.maxOxygen * 100) + '%';
+            document.getElementById('hungerBar').style.width = 
+                (oceanGameData.player.hunger / oceanGameData.player.maxHunger * 100) + '%';
+            document.getElementById('achievements').textContent = 
+                `Depth Record: ${Math.floor(oceanGameData.maxDepth)}m`;
+            
+            // Update bait and fish counts
+            document.getElementById('baitCount').textContent = `${oceanGameData.bait} / ${oceanGameData.maxBait}`;
+            document.getElementById('fishCount').textContent = `${oceanGameData.inventory.fish} / ${oceanGameData.maxInventory.fish}`;
+            
+            if (document.getElementById('currentUsername')) {
+                document.getElementById('currentUsername').textContent = oceanGameData.username || 'Anonymous';
+            }
+            
+            // Update spear indicator
+            const spearIndicator = document.getElementById('spearIndicator');
+            if (oceanGameData.hasSpear) {
+                spearIndicator.style.display = 'block';
+                spearIndicator.style.borderColor = '#00ff88';
+                spearIndicator.innerHTML = `
+                    <span style="color: #00ff88; font-weight: bold;">🔱 SPEAR READY</span><br>
+                    <span style="font-size: 0.9em;">Press E to hunt!</span>
+                `;
+            } else {
+                spearIndicator.style.display = 'block';
+            }
+        }
+
+        window.changeUsername = function() {
+            // Open the modal
+            document.getElementById('usernameModal').classList.add('active');
+            
+            // Set current username in input
+            const input = document.getElementById('usernameInput');
+            input.value = oceanGameData.username || '';
+            
+            // Focus and select the input
+            setTimeout(() => {
+                input.focus();
+                input.select();
+            }, 100);
+        };
+
+        window.confirmUsernameChange = function() {
+            const input = document.getElementById('usernameInput');
+            const newUsername = input.value.trim();
+            
+            if (newUsername !== '') {
+                oceanGameData.username = newUsername.substring(0, 20);
+                localStorage.setItem('oceanSurvivalUsername', oceanGameData.username);
+                
+                // Update display
+                const usernameDisplay = document.getElementById('currentUsername');
+                if (usernameDisplay) {
+                    usernameDisplay.textContent = oceanGameData.username;
+                }
+                
+                updateOceanDisplay();
+            }
+            
+            closeUsernameModal();
+        };
+
+        window.closeUsernameModal = function() {
+            document.getElementById('usernameModal').classList.remove('active');
+        };
+
+        // Controls Menu Functions
+        window.openControlsMenu = function() {
+            document.getElementById('controlsModal').classList.add('active');
+        };
+
+        window.closeControlsMenu = function() {
+            document.getElementById('controlsModal').classList.remove('active');
+        };
+
+        // Allow Enter key to confirm
+        document.addEventListener('DOMContentLoaded', function() {
+            const input = document.getElementById('usernameInput');
+            if (input) {
+                input.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        confirmUsernameChange();
+                    }
+                });
+            }
+        });
+
+        function showGameOver(reason) {
+            stopOceanGame();
+            
+            // Save to leaderboard
+            saveToLeaderboard(oceanGameData.username, oceanGameData.maxDepth, oceanGameData.score);
+            
+            // Find player rank
+            const leaderboard = getLeaderboard();
+            const playerEntry = leaderboard.find(entry => 
+                entry.username.toLowerCase() === oceanGameData.username.toLowerCase()
+            );
+            const rank = playerEntry ? leaderboard.indexOf(playerEntry) + 1 : '-';
+
+            // Update modal content
+            document.getElementById('gameOverReason').textContent = reason;
+            document.getElementById('gameOverUsername').textContent = oceanGameData.username;
+            document.getElementById('gameOverDepth').textContent = Math.floor(oceanGameData.maxDepth) + 'm';
+            document.getElementById('gameOverScore').textContent = oceanGameData.score;
+            document.getElementById('gameOverRank').textContent = rank <= 20 ? `#${rank} / ${leaderboard.length}` : `#${rank}`;
+
+            // Update leaderboard display
+            displayLeaderboard();
+
+            // Show modal
+            document.getElementById('gameOverModal').classList.add('active');
+        }
+
+        function closeGameOverModal() {
+            document.getElementById('gameOverModal').classList.remove('active');
+            exitGame();
+        }
+
+        function restartOceanGame() {
+            document.getElementById('gameOverModal').classList.remove('active');
+            
+            // Reset game state
+            oceanGameData.resources = { metal: 0, crystal: 0, wood: 0 };
+            oceanGameData.inventory = { fish: 0 };
+            oceanGameData.bait = 0;
+            oceanGameData.score = 0;
+            oceanGameData.depth = 0;
+            oceanGameData.maxDepth = 0;
+            oceanGameData.player.oxygen = oceanGameData.player.maxOxygen;
+            oceanGameData.player.hunger = oceanGameData.player.maxHunger;
+            oceanGameData.hasSpear = false;
+            oceanGameData.items = [];
+            oceanGameData.creatures = [];
+            
+            // Reset upgrades but keep levels
+            Object.keys(oceanGameData.upgrades).forEach(key => {
+                oceanGameData.upgrades[key].level = 0;
+                // Reset costs to base
+                if (key === 'spear') {
+                    oceanGameData.upgrades[key].cost = { wood: 5, metal: 2 };
+                } else if (key === 'bait') {
+                    oceanGameData.upgrades[key].cost = { crystal: 2 };
+                } else if (key === 'oxygenTank') {
+                    oceanGameData.upgrades[key].cost = { metal: 10, crystal: 5 };
+                } else if (key === 'swimSpeed') {
+                    oceanGameData.upgrades[key].cost = { metal: 15, crystal: 10 };
+                } else if (key === 'scanner') {
+                    oceanGameData.upgrades[key].cost = { metal: 20, crystal: 15 };
+                }
+            });
+
+            // Restart game
+            startOceanGame();
+        }
+
+        function renderOceanUpgrades() {
+            const list = document.getElementById('oceanUpgradesList');
+            list.innerHTML = '';
+
+            Object.keys(oceanUpgradeDefs).forEach(key => {
+                const def = oceanUpgradeDefs[key];
+                const upg = oceanGameData.upgrades[key];
+                const cost = upg.cost;
+                
+                // Check if player can afford
+                let canBuy = true;
+                if (cost.metal && oceanGameData.resources.metal < cost.metal) canBuy = false;
+                if (cost.crystal && oceanGameData.resources.crystal < cost.crystal) canBuy = false;
+                if (cost.wood && oceanGameData.resources.wood < cost.wood) canBuy = false;
+
+                // Don't show spear if already crafted
+                if (key === 'spear' && oceanGameData.hasSpear) return;
+                
+                // Don't show bait if at max capacity
+                if (key === 'bait' && oceanGameData.bait >= oceanGameData.maxBait) return;
+
+                // Build cost string
+                let costString = '';
+                if (cost.wood) costString += `🪵 ${cost.wood} Wood `;
+                if (cost.metal) costString += `⚙️ ${cost.metal} Metal `;
+                if (cost.crystal) costString += `💎 ${cost.crystal} Crystal`;
+
+                const div = document.createElement('div');
+                div.className = 'upgrade';
+                div.innerHTML = `
+                    <div class="upgrade-header">
+                        <span class="upgrade-name">${def.icon} ${def.name}</span>
+                        <span class="upgrade-level">${key === 'spear' ? '' : 'Lv ' + upg.level}</span>
+                    </div>
+                    <div class="upgrade-desc">${def.desc}</div>
+                    <div class="upgrade-cost">${costString}</div>
+                    <button class="upgrade-btn" onclick="buyOceanUpgrade('${key}')" ${!canBuy ? 'disabled' : ''}>
+                        ${canBuy ? 'CRAFT' : 'NOT ENOUGH'}
+                    </button>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function buyOceanUpgrade(key) {
+            const upg = oceanGameData.upgrades[key];
+            const cost = upg.cost;
+
+            // Check if player has enough resources
+            let canAfford = true;
+            if (cost.metal && oceanGameData.resources.metal < cost.metal) canAfford = false;
+            if (cost.crystal && oceanGameData.resources.crystal < cost.crystal) canAfford = false;
+            if (cost.wood && oceanGameData.resources.wood < cost.wood) canAfford = false;
+
+            if (canAfford) {
+                // Deduct resources
+                if (cost.metal) oceanGameData.resources.metal -= cost.metal;
+                if (cost.crystal) oceanGameData.resources.crystal -= cost.crystal;
+                if (cost.wood) oceanGameData.resources.wood -= cost.wood;
+                
+                upg.level++;
+
+                // Apply upgrade effects
+                if (key === 'oxygenTank') {
+                    oceanGameData.player.maxOxygen += 50;
+                    oceanGameData.player.oxygen = oceanGameData.player.maxOxygen;
+                } else if (key === 'swimSpeed') {
+                    oceanGameData.player.speed += 1;
+                } else if (key === 'scanner') {
+                    // Scanner effect applied in drawing
+                } else if (key === 'spear') {
+                    oceanGameData.hasSpear = true;
+                } else if (key === 'bait') {
+                    oceanGameData.bait = Math.min(oceanGameData.maxBait, oceanGameData.bait + 2);
+                }
+
+                // Increase costs (except spear and bait - they don't level up)
+                if (key !== 'spear' && key !== 'bait') {
+                    if (cost.metal) upg.cost.metal = Math.floor(upg.cost.metal * 1.5);
+                    if (cost.crystal) upg.cost.crystal = Math.floor(upg.cost.crystal * 1.5);
+                    if (cost.wood) upg.cost.wood = Math.floor(upg.cost.wood * 1.5);
+                }
+
+                updateOceanDisplay();
+                renderOceanUpgrades();
+            }
+        }
+
+        function oceanGameLoop() {
+            if (!oceanGameData.running) return;
+
+            const ctx = oceanGameData.ctx;
+            const canvas = oceanGameData.canvas;
+            const player = oceanGameData.player;
+
+            // Move player
+            if (oceanGameData.keys['w']) player.y -= player.speed;
+            if (oceanGameData.keys['s']) player.y += player.speed;
+            if (oceanGameData.keys['a']) player.x -= player.speed;
+            if (oceanGameData.keys['d']) player.x += player.speed;
+            if (oceanGameData.keys[' ']) player.y -= player.speed * 0.8;
+            if (oceanGameData.keys['shift']) player.y += player.speed * 0.8;
+
+            // Boundaries
+            player.x = Math.max(20, Math.min(canvas.width - 20, player.x));
+            player.y = Math.max(20, player.y); // Can go infinitely deep
+
+            // Camera follows player vertically (smooth follow)
+            const targetCameraY = player.y - canvas.height * 0.4; // Keep player at 40% from top
+            oceanGameData.cameraY += (targetCameraY - oceanGameData.cameraY) * 0.1;
+
+            // Calculate depth
+            oceanGameData.depth = Math.max(0, player.y - 100);
+            if (oceanGameData.depth > oceanGameData.maxDepth) {
+                oceanGameData.maxDepth = oceanGameData.depth;
+            }
+
+            // Oxygen management
+            if (player.y > 100) {
+                player.oxygen -= 0.05;
+                if (player.oxygen <= 0) {
+                    showGameOver('Out of Oxygen!');
+                    return;
+                }
+            } else {
+                player.oxygen = Math.min(player.maxOxygen, player.oxygen + 0.5);
+            }
+
+            // Hunger management
+            player.hunger -= 0.02; // Slowly drain hunger
+            if (player.hunger <= 0) {
+                showGameOver('You Starved!');
+                return;
+            }
+
+            // Spear cooldown
+            if (oceanGameData.spearCooldown > 0) {
+                oceanGameData.spearCooldown--;
+            }
+
+            // Spear attack
+            if (oceanGameData.keys['e'] && oceanGameData.hasSpear && oceanGameData.spearCooldown === 0) {
+                oceanGameData.spearCooldown = 30; // 0.5 second cooldown
+                
+                // Find nearest green fish within range
+                let nearestFish = null;
+                let nearestDist = 100; // Spear range
+                
+                oceanGameData.creatures.forEach(creature => {
+                    if (!creature.dangerous) {
+                        const dx = creature.x - player.x;
+                        const dy = creature.y - player.y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        
+                        if (dist < nearestDist) {
+                            nearestDist = dist;
+                            nearestFish = creature;
+                        }
+                    }
+                });
+
+                // Kill the fish
+                if (nearestFish && oceanGameData.inventory.fish < oceanGameData.maxInventory.fish) {
+                    const index = oceanGameData.creatures.indexOf(nearestFish);
+                    oceanGameData.creatures.splice(index, 1);
+                    oceanGameData.inventory.fish++;
+                    oceanGameData.score += 20;
+                    
+                    // Consume bait if active
+                    if (oceanGameData.bait > 0) {
+                        oceanGameData.bait--;
+                    }
+                    
+                    spawnCreature(); // Spawn a new one
+                    updateOceanDisplay();
+                }
+            }
+
+            // Eat fish (Q key)
+            if (oceanGameData.keys['q']) {
+                if (oceanGameData.inventory.fish > 0) {
+                    oceanGameData.inventory.fish--;
+                    player.hunger = Math.min(player.maxHunger, player.hunger + 30);
+                    updateOceanDisplay();
+                }
+            }
+
+            // Clear and apply camera transform
+            ctx.save();
+            ctx.translate(0, -oceanGameData.cameraY);
+
+            // Ocean background (gets darker deeper you go)
+            const darknessLevel = Math.min(1, oceanGameData.depth / 1000);
+            ctx.fillStyle = `rgb(${Math.floor(0 * (1 - darknessLevel))}, ${Math.floor(26 * (1 - darknessLevel))}, ${Math.floor(51 * (1 - darknessLevel))})`;
+            ctx.fillRect(0, oceanGameData.cameraY, canvas.width, canvas.height);
+
+            // Water surface
+            ctx.fillStyle = '#0066cc';
+            ctx.fillRect(0, 0, canvas.width, 100);
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+            for (let i = 0; i < canvas.width; i += 50) {
+                ctx.fillRect(i, 90, 30, 10);
+            }
+
+            // Ocean floor at very deep
+            if (player.y > 1800) {
+                ctx.fillStyle = '#1a0a00';
+                ctx.fillRect(0, 2000, canvas.width, 500);
+            }
+
+            // Draw resources and check collision
+            oceanGameData.items.forEach((item, index) => {
+                const scannerRange = 100 + (oceanGameData.upgrades.scanner.level * 50);
+                const dx = item.x - player.x;
+                const dy = item.y - player.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+
+                // Check if player touches resource
+                if (dist < player.size + item.size) {
+                    // Check inventory cap for resources
+                    const totalResources = oceanGameData.resources.metal + oceanGameData.resources.crystal + oceanGameData.resources.wood;
+                    
+                    if (totalResources < oceanGameData.maxInventory.resources) {
+                        oceanGameData.resources[item.type]++;
+                        oceanGameData.score += 10;
+                        oceanGameData.items.splice(index, 1);
+                        spawnResource();
+                        updateOceanDisplay();
+                        renderOceanUpgrades();
+                    }
+                    return;
+                }
+
+                // Glow if in scanner range
+                if (dist < scannerRange) {
+                    ctx.shadowBlur = 20;
+                    ctx.shadowColor = item.color;
+                }
+
+                ctx.fillStyle = item.color;
+                ctx.beginPath();
+                ctx.arc(item.x, item.y, item.size, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.shadowBlur = 0;
+
+                // Resource icon
+                ctx.fillStyle = '#fff';
+                ctx.font = '12px Arial';
+                ctx.textAlign = 'center';
+                if (item.type === 'metal') {
+                    ctx.fillText('⚙️', item.x, item.y + 5);
+                } else if (item.type === 'crystal') {
+                    ctx.fillText('💎', item.x, item.y + 5);
+                } else if (item.type === 'wood') {
+                    ctx.fillText('🪵', item.x, item.y + 5);
+                }
+            });
+
+            // Draw and update creatures
+            oceanGameData.creatures.forEach(creature => {
+                const dx = creature.x - player.x;
+                const dy = creature.y - player.y;
+                const distToPlayer = Math.sqrt(dx * dx + dy * dy);
+
+                // AI Behavior
+                if (!creature.dangerous) {
+                    // Peaceful fish behavior
+                    if (oceanGameData.bait > 0) {
+                        // Fish attracted to player when bait is active
+                        if (distToPlayer < 300) {
+                            const attractAngle = Math.atan2(-dy, -dx);
+                            creature.speedX = Math.cos(attractAngle) * 2;
+                            creature.speedY = Math.sin(attractAngle) * 1.5;
+                        }
+                    } else {
+                        // Normal flee behavior when no bait
+                        if (distToPlayer < 150) {
+                            creature.fleeing = true;
+                            creature.fleeTimer = 120;
+                            const fleeAngle = Math.atan2(dy, dx);
+                            creature.speedX = Math.cos(fleeAngle) * 4;
+                            creature.speedY = Math.sin(fleeAngle) * 3;
+                        }
+
+                        if (creature.fleeTimer > 0) {
+                            creature.fleeTimer--;
+                        } else {
+                            creature.fleeing = false;
+                            if (Math.abs(creature.speedX) > 2) {
+                                creature.speedX *= 0.95;
+                            }
+                            if (Math.abs(creature.speedY) > 1.5) {
+                                creature.speedY *= 0.95;
+                            }
+                        }
+                    }
+                } else {
+                    // Dangerous fish chase player if close
+                    if (distToPlayer < 200) {
+                        const chaseAngle = Math.atan2(-dy, -dx);
+                        creature.speedX = Math.cos(chaseAngle) * 3;
+                        creature.speedY = Math.sin(chaseAngle) * 2;
+                    } else {
+                        // Normal patrol
+                        creature.speedX *= 0.98;
+                        creature.speedY *= 0.98;
+                        if (Math.abs(creature.speedX) < 0.5) {
+                            creature.speedX = (Math.random() - 0.5) * 3;
+                        }
+                    }
+                }
+
+                creature.x += creature.speedX;
+                creature.y += creature.speedY;
+
+                // Boundaries
+                if (creature.x < 0 || creature.x > canvas.width) creature.speedX *= -1;
+                if (creature.y < 150) {
+                    creature.y = 150;
+                    creature.speedY = Math.abs(creature.speedY);
+                }
+
+                // Draw creature
+                ctx.fillStyle = creature.dangerous ? '#ff4444' : '#44ff88';
+                ctx.beginPath();
+                ctx.arc(creature.x, creature.y, creature.size, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Add glow for dangerous fish
+                if (creature.dangerous && distToPlayer < 200) {
+                    ctx.strokeStyle = '#ff0000';
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                }
+
+                ctx.fillStyle = '#fff';
+                ctx.font = '20px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(creature.dangerous ? '🦈' : '🐠', creature.x, creature.y + 7);
+
+                // Check collision with player
+                if (creature.dangerous && distToPlayer < player.size + creature.size) {
+                    player.oxygen -= 20;
+                    creature.x = Math.random() * canvas.width;
+                    creature.y = player.y + 300 + Math.random() * 200; // Respawn deeper
+                }
+            });
+
+            // Draw player (submarine/diver)
+            ctx.fillStyle = '#ffaa00';
+            ctx.beginPath();
+            ctx.arc(player.x, player.y, player.size, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            ctx.fillStyle = '#000';
+            ctx.font = '25px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('🤿', player.x, player.y + 8);
+
+            // Draw spear attack range if attacking
+            if (oceanGameData.keys['e'] && oceanGameData.hasSpear && oceanGameData.spearCooldown === 0) {
+                ctx.strokeStyle = 'rgba(255, 100, 100, 0.5)';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(player.x, player.y, 100, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+
+            // Draw spear if equipped
+            if (oceanGameData.hasSpear) {
+                ctx.strokeStyle = '#888888';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(player.x + 15, player.y);
+                ctx.lineTo(player.x + 35, player.y);
+                ctx.stroke();
+                
+                // Spear tip
+                ctx.fillStyle = '#666666';
+                ctx.beginPath();
+                ctx.moveTo(player.x + 35, player.y);
+                ctx.lineTo(player.x + 40, player.y - 5);
+                ctx.lineTo(player.x + 40, player.y + 5);
+                ctx.fill();
+            }
+
+            ctx.restore(); // Reset camera transform
+
+            // Draw depth indicator (fixed to screen)
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 20px Arial';
+            ctx.textAlign = 'left';
+            ctx.fillText(`Depth: ${Math.floor(oceanGameData.depth)}m`, 10, canvas.height - 20);
+
+            updateOceanDisplay();
+            oceanGameData.animationId = requestAnimationFrame(oceanGameLoop);
+        }
+    </script>
+</body>
+</html>
